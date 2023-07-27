@@ -1,10 +1,7 @@
 <p align="center"> HAY UN REPOSITORIO PARA LA PARTE DEL FRONT CON REACT AQUI ESTA EL LINK <a>https://github.com/Rodrigomelend13/react_shoppingifyL5.git</a>  </p>
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+OJO AL MENSAJE DE ARRIBA
 </p>
 
 ## About Laravel
