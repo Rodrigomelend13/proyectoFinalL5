@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -152,6 +151,37 @@ class ItemTableSeeder extends Seeder
         	'name' => 'Watermelon',
         	'note' => 'Watermelon',
             'category_id' => 3,
+        	'created_at' => NOW(),
+        	'updated_at' => NOW()
+        ]);
+
+		DB::table('item')->insert([
+        	'name' => 'Chicken Leg Box',
+        	'note' => 'Chicken Leg Box',
+            'category_id' => 4,
+        	'created_at' => NOW(),
+        	'updated_at' => NOW()
+        ]);
+
+		DB::table('item')->insert([
+        	'name' => 'Chicken 1kg',
+        	'note' => 'Chicken 1kg',
+            'category_id' => 4,
+        	'created_at' => NOW(),
+        	'updated_at' => NOW()
+        ]);
+
+		DB::table('item')->insert([
+        	'name' => 'Pork Fillets',
+        	'note' => 'Pork Fillets',
+            'category_id' => 4,
+        	'created_at' => NOW(),
+        	'updated_at' => NOW()
+        ]);
+		DB::table('item')->insert([
+        	'name' => 'Salmon 1kg',
+        	'note' => 'Salmon 1kg',
+            'category_id' => 4,
         	'created_at' => NOW(),
         	'updated_at' => NOW()
         ]);

@@ -152,7 +152,7 @@ class ListaController extends Controller
     public function find_lists_by_month_year(Request $request)
     {
         $months = DB::table("list")
-            ->selectRaw("to_char(created_at , 'YYYY-MM') AS new_date")
+            ->selectRaw("DATE_FORMAT(created_at , '%Y-%m') AS new_date")
             ->where("active", "=", "0")
             ->where("user_id", "=", $request->input('user_id'))
             ->orderBy('created_at', "DESC")
@@ -160,13 +160,14 @@ class ListaController extends Controller
             ->get();
 
         $lists_by_month = [];
+
         foreach ($months as $month) {
             $month_year = $month->new_date;
             $list = DB::table("list")
-                ->selectRaw("id,name,canceled,to_char(created_at , 'YYYY-MM') AS new_date,to_char(created_at , 'DD.MM.YYYY') AS created_at, to_char(created_at,'Day') AS day,to_char(created_at,'Month') AS month,to_char(created_at , 'YYYY') AS year")
+                ->selectRaw("id,name,canceled,DATE_FORMAT(created_at , '%Y-%m') AS new_date,DATE_FORMAT(created_at , '%d.%m.%Y') AS created_at,DATE_FORMAT(created_at,'%W') AS day,DATE_FORMAT(created_at,'%M') AS month,DATE_FORMAT(created_at , '%Y') AS year")
                 ->where("active", "=", "0")
                 ->where("user_id", "=", $request->input('user_id'))
-                ->where(DB::raw("to_char(created_at , 'YYYY-MM')"), "=", $month_year)
+                ->where(DB::raw("DATE_FORMAT(created_at , '%Y-%m')"), "=", $month_year)
                 ->orderBy('created_at', "DESC")
                 ->get();
 
@@ -179,11 +180,12 @@ class ListaController extends Controller
     // muestra listas inactivas por mes (no se si funcione check!!!)
     public function get_number_items_by_month()
     {
+        // Consulta para obtener los meses (en formato 'YYYY-MM') de las listas que están inactivas (inactive = 0)
         $months = DB::table("list")
-            ->selectRaw("to_char(created_at , 'YYYY-MM') AS new_date")
+            ->selectRaw("DATE_FORMAT(created_at , '%Y-%m') AS new_date")
             ->where("active", "=", "0")
-            ->orderBy('created_at', "DESC")
-            ->groupBy('created_at')
+            ->groupBy(DB::raw("DATE_FORMAT(created_at , '%Y-%m')"))
+            ->orderBy(DB::raw("DATE_FORMAT(created_at , '%Y-%m')"), "DESC")
             ->get();
 
         $lists_by_month = [];
@@ -191,9 +193,9 @@ class ListaController extends Controller
             $month_year = $month->new_date;
 
             $lists = DB::table("list")
-                ->selectRaw("id,name,canceled,to_char(created_at , 'YYYY-MM') AS new_date,to_char(created_at , 'DD.MM.YYYY') AS created_at, to_char(created_at,'Day') AS day,to_char(created_at,'Month') AS month,to_char(created_at , 'YYYY') AS year")
+                ->selectRaw("id,name,canceled,DATE_FORMAT(created_at , '%Y-%m') AS new_date, DATE_FORMAT(created_at , '%d.%m.%Y') AS created_at, DATE_FORMAT(created_at,'%W') AS day, DATE_FORMAT(created_at,'%M') AS month, DATE_FORMAT(created_at , '%Y') AS year")
                 ->where("active", "=", "0")
-                ->where(DB::raw("to_char(created_at , 'YYYY-MM')"), "=", $month_year)
+                ->where(DB::raw("DATE_FORMAT(created_at , '%Y-%m')"), "=", $month_year)
                 ->orderBy('created_at', "DESC")
                 ->get();
 
@@ -213,6 +215,8 @@ class ListaController extends Controller
 
         return $lists_by_month;
     }
+
+
 
 
     //   agregar un item a la lista
@@ -286,9 +290,11 @@ class ListaController extends Controller
         foreach ($items as $item) {
             $this->add_item_to_list($item['id'], $list->id);
 
-            $item_in_list = DB::table('items_list')
-                ->where('item_id', '=', $item['id'])
-                ->where('lista_id', '=', $request->input('list_id'))
+            DB::table('items_list')
+                ->where([
+                    ['item_id', '=', $item['id']],
+                    ['lista_id', '=', $request->input('list_id')]
+                ])
                 ->update(['quantity' => $item['pivot']['quantity']]);
         }
         return $list->items;
@@ -297,10 +303,15 @@ class ListaController extends Controller
     //   actualizar la cantidad de un item en la lista
     public function update_item_quantity(Request $request)
     {
+
+        $item_id = $request->input('item_id');
+        $list_id = $request->input('list_id');
+        $quantity = $request->input('quantity');
+
         $item_in_list = DB::table('item_list')
-            ->where('item_id', '=', $request->input('item_id'))
-            ->where('lista_id', '=', $request->input('list_id'))
-            ->update(['quantity' => $request->input('quantity')]);
+            ->where('item_id', '=', $item_id)
+            ->where('lista_id', '=', $list_id)
+            ->update(['quantity' => $quantity]);
 
         return $item_in_list;
     }
@@ -308,7 +319,7 @@ class ListaController extends Controller
     //   eliminar un item de la lista
     public function remove_item_from_list(Request $request)
     {
-        $item_in_list = DB::table('item_list')
+             DB::table('item_list')
             ->where('item_id', '=', $request->input('item_id'))
             ->where('lista_id', '=', $request->input('list_id'))
             ->delete();
